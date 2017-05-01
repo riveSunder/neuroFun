@@ -121,7 +121,7 @@ def forProp(myInputs,myWeights):
 
 #back propagation function
 
-def backProp(myInputs,myCrossInputs,myTarget,myWeights,myIter=10,lR=1e-5,myLambda=0,myMom=1e-5,dropout=False):
+def backProp(myInputs,myCrossInputs,myTarget,myWeights,myIter=10,lR=1e-5,myLambda=0,myMom=1e-5,stopEarly=False):
     #init momentum
     momSpeed = []
     #init weight penalties
@@ -129,6 +129,10 @@ def backProp(myInputs,myCrossInputs,myTarget,myWeights,myIter=10,lR=1e-5,myLambd
     #init gradients
     dGrad = []
     Delta = []
+    J = []
+    if(stopEarly):
+        bestE = 2
+        myBestWeights = myWeights
     for n in range(len(myWeights)): #-1,-1,-1):
         wPen.append(0*myWeights[n])
         dGrad.append(0*myWeights[n])
@@ -138,7 +142,6 @@ def backProp(myInputs,myCrossInputs,myTarget,myWeights,myIter=10,lR=1e-5,myLambd
         #print(np.shape(dGrad[n]))
         #print(np.shape(momSpeed[n]))
     m = m = np.shape(myInputs)[1]
-   
     myFreq = int(myIter/10)
   
     print("Begin Training . . . ")
@@ -149,6 +152,14 @@ def backProp(myInputs,myCrossInputs,myTarget,myWeights,myIter=10,lR=1e-5,myLambd
         #print(np.shape(myZ[0]))
         #use squared error as objective function
         E = (myTarget.T-myOutput[len(myOutput)-1])
+        if(stopEarly):
+            # Remember the best weights so far
+            myE = np.mean(np.abs(E))
+            #print(myE)
+            if(myE < bestE):
+                bestE = myE
+                myBestWeights = myWeights
+        J.append(np.mean(np.abs(E)))
         d = []
         #print(np.shape(E.T))
         d.append(E.T)
@@ -184,4 +195,9 @@ def backProp(myInputs,myCrossInputs,myTarget,myWeights,myIter=10,lR=1e-5,myLambd
             #print(np.mean(Theta3))
         #print("Training Finished, avg error = "+str(np.mean(np.abs(E))))
         #print(E)
-    return myWeights
+    if (stopEarly):
+        print(bestE)
+    #   myWeights = myBestWeights
+    #Return current weights, best weights, and a history of the cost function
+    return myWeights, myBestWeights, J 
+
