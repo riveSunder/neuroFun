@@ -26,6 +26,14 @@ def reLUGradient(z):
 	    myReLUGrad[c] = 0.0
     return myReLUGrad 
 
+def softplus(z):
+    mySoftplus = np.log(1+np.exp(z))
+    return mySoftplus
+   
+def softplusGradient(z):
+    mySoftplusGrad = sigmoid(z)
+    return(mySoftplusGrad)
+
 def hidToVis(rbmW,hidStates):
     visProb = np.dot(rbmW.T,hidStates)
     visProb = sigmoid(visProb)
