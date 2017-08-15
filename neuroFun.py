@@ -13,6 +13,19 @@ def sigmoidGradient(z):
     mySigGrad = sigmoid(z)*(1-sigmoid(z))
     return mySigGrad
 
+def reLU(z):
+    myReLU = np.max([[np.zeros(len(x))],[x]],axis=0)	
+    return myReLU
+
+def reLUGradient(z):
+    myReLUGrad = np.zeros(len(z))
+    for c in range(0,z):
+	if (z[c] > 0):
+	    myReLUGrad[c] = 1.0
+	else:
+	    myReLUGrad[c] = 0.0
+    return myReLUGrad 
+
 def hidToVis(rbmW,hidStates):
     visProb = np.dot(rbmW.T,hidStates)
     visProb = sigmoid(visProb)
