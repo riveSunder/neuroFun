@@ -2,6 +2,8 @@
 ### Basic functions for training neural networks and restricted 
 ### Boltzmann machines
 ### www.github.com/thescinder/neuroFun
+import numpy as np
+import matplotlib.pyplot as plt
 
 def sigmoid(z):
     #Returns the logistic of the value z
@@ -18,13 +20,13 @@ def reLU(z):
     return myReLU
 
 def reLUGradient(z):
-    myReLUGrad = np.zeros(len(z))
-    for c in range(0,z):
-	if (z[c] > 0):
-	    myReLUGrad[c] = 1.0
-	else:
-	    myReLUGrad[c] = 0.0
-    return myReLUGrad 
+	myReLUGrad = np.zeros(len(z))
+	for c in range(0,z):
+		if (z[c] > 0):
+			myReLUGrad[c] = 1.0
+		else:
+			myReLUGrad[c] = 0.0
+	return myReLUGrad 
 
 def softplus(z):
     mySoftplus = np.log(1+np.exp(z))
@@ -73,8 +75,10 @@ def trainRBMLayers(a0,hiddenLayers,lR,myIter):
     #lR - learning rate
     #myIter - number of iterations to train
     myTest = a0
+    print('debug')
     J = []
-    rbmW = initRBMW(hiddenLayers,np.shape(myTest)[0],1)
+    print('test')
+    rbmW = initRBMW(hiddenLayers,myTest.shape[0],1)
     for j in range(myIter):
         myTest = sampPRand(a0)
         myHid = visToHid(rbmW,myTest)
