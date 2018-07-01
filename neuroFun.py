@@ -140,8 +140,8 @@ def forProp(myInputs,myWeights):
         #print(np.shape(an))
     #print(np.shape(an[0]))
     #print(np.shape(np.squeeze(an)))
-	an = np.array(an)
-	zn  = np.array(zn)
+    an = np.array(an)
+    zn  = np.array(zn)
     return an,zn
 
 
