@@ -107,11 +107,13 @@ def trainRBMLayers(a0,hiddenLayers,lR,myIter):
     return rbmW.T
 
 #forward propagation 
-def forProp(myInputs,myWeights):
+def forProp(myInputs,myWeights,dORate=0.0):
     #print(np.shape(myInputs))
     #print(np.shape(myWeights[0]))
     zn = [] #np.dot(myInputs,myWeights[0])
     an = [] #sigmoid(zn)
+    myDOWeights = []
+
     if(0):
         for n in range(len(myWeights)):
             zn.append(np.zeros((      np.shape(myWeights[n][1])[0],np.shape(a0)[0])))
@@ -123,8 +125,17 @@ def forProp(myInputs,myWeights):
     if(0):
         zn[0] = np.dot(myInputs.T,myWeights[0])
         an[0] = sigmoid(zn[0])
-    zn.append(np.squeeze(np.dot(myInputs.T,myWeights[0])))
-    #print(np.shape(zn))
+    np.random.seed(1)
+	
+    if(dORate):
+        dO = np.random.random(np.shape(myWeights[0]))
+        dO[dO>dORate] = 1.0
+        dO[dO<1.0] = 0.0
+        myDOWeights.append(dO*myWeights[0])
+        zn.append(np.squeeze(np.dot(myInputs.T,myDOWeights[0])))
+    else:	
+        zn.append(np.squeeze(np.dot(myInputs.T,myWeights[0])))
+        #print(np.shape(zn))
     an.append(sigmoid(zn[0]))
     #print(np.shape(zn[0]))
     for n in range(1,len(myWeights)):
@@ -134,21 +145,26 @@ def forProp(myInputs,myWeights):
             print(n)
             zn[n] = np.dot(an[n-1],myWeights[n])
             an[n] = sigmoid(zn[n])
-        zn.append(np.dot(an[n-1],myWeights[n]))
+
+        if(dORate):
+            dO = np.random.random(np.shape(myWeights[n]))
+            dO[dO>dORate] = 1.0
+            dO[dO<1.0] = 0.0
+            myDOWeights.append(dO*myWeights[n])
+            zn.append(np.squeeze(np.dot(an[n-1],myDOWeights[n])))
+        else:	
+            zn.append(np.dot(an[n-1],myWeights[n]))
         an.append(sigmoid(zn[n]))
         #print(np.shape(an[n]))
         #print(np.shape(an))
-    #print(np.shape(an[0]))
-    #print(np.shape(np.squeeze(an)))
-    an = np.array(an)
-    zn  = np.array(zn)
-    return an,zn
+    
+    return an,zn, myDOWeights
 
 
 
 #back propagation function
 
-def backProp(myInputs,myCrossInputs,myTarget,myWeights,myIter=10,lR=1e-5,myLambda=0,myMom=1e-5,stopEarly=False):
+def backProp(myInputs,myCrossInputs,myTarget,myWeights,myIter=10,lR=1e-5,myLambda=0,myMom=1e-5,stopEarly=False,dORate=0.0):
     #init momentum
     momSpeed = []
     #init weight penalties
@@ -174,7 +190,7 @@ def backProp(myInputs,myCrossInputs,myTarget,myWeights,myIter=10,lR=1e-5,myLambd
     print("Begin Training . . . ")
     for i in range(myIter):
         #Run forward propagation.
-        myOutput, myZ = forProp(myInputs,myWeights)
+        myOutput, myZ, myDOWeights = forProp(myInputs,myWeights,dORate)
         #print(np.shape(myOutput))
         #print(np.shape(myZ[0]))
         #use squared error as objective function
@@ -199,8 +215,10 @@ def backProp(myInputs,myCrossInputs,myTarget,myWeights,myIter=10,lR=1e-5,myLambd
 
 
         for n in range(len(myWeights)-1,-1,-1):
-            #
-            d.append(np.dot(myWeights[n],d[len(d)-1]) * sigmoidGradient(myZ[n-1].T))
+            if(dORate):
+                d.append(np.dot(myDOWeights[n],d[len(d)-1]) * sigmoidGradient(myZ[n-1].T))
+            else:
+            	d.append(np.dot(myWeights[n],d[len(d)-1]) * sigmoidGradient(myZ[n-1].T))
            
 
         for n in (range(len(myWeights)-1,-1,-1)):
