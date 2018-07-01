@@ -140,6 +140,8 @@ def forProp(myInputs,myWeights):
         #print(np.shape(an))
     #print(np.shape(an[0]))
     #print(np.shape(np.squeeze(an)))
+	an = np.array(an)
+	zn  = np.array(zn)
     return an,zn
 
 
@@ -157,7 +159,7 @@ def backProp(myInputs,myCrossInputs,myTarget,myWeights,myIter=10,lR=1e-5,myLambd
     J = []
     if(stopEarly):
         bestE = 2
-        myBestWeights = myWeights
+    myBestWeights = np.copy(myWeights)
     for n in range(len(myWeights)): #-1,-1,-1):
         wPen.append(0*myWeights[n])
         dGrad.append(0*myWeights[n])
