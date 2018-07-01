@@ -104,7 +104,7 @@ def trainRBMLayers(a0,hiddenLayers,lR,myIter):
     plt.plot(J)
     plt.show()
     print("Finished with RBM training of size " + str(np.shape(rbmW.T)))
-    return rbmW.T
+    return rbmW, myReconProb
 
 #forward propagation 
 def forProp(myInputs,myWeights,dORate=0.0):
